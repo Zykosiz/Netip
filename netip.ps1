@@ -15,7 +15,7 @@ $WebClient = New-Object Net.WebClient
 $WebClient.DownloadFile($DownloadUrl, $DownloadPath)
 Import-Module -Name PSWindowsUpdate
 Get-WindowsUpdate
-Install-WindowsUpdate Install-WindowsUpdate
+Install-WindowsUpdate -AcceptAll
 #Restart-Computer -Force
 
 #Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
@@ -23,5 +23,6 @@ Install-WindowsUpdate Install-WindowsUpdate
 #choco install googlechrome --ignore-checksums
 #Invoke-WebRequest "https://get.teamviewer.com/6nsd5xz" -OutFile "C:\Temp\Netip.exe"
 #Move-Item -Path "C:\Temp\Netip.exe" -Destination ""$env:userprofile\desktop\netip.exe"" -Force
+
 
 
