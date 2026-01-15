@@ -1,3 +1,6 @@
 # Netip
 Standard Opsætning
-irm website | iex
+
+
+
+irm https://raw.githubusercontent.com/Zykosiz/Netip/refs/heads/main/choco.ps1 | iex
