@@ -3,4 +3,4 @@ Standard Opsætning
 
 
 
-irm https://raw.githubusercontent.com/Zykosiz/Netip/refs/heads/main/choco.ps1 | iex
+irm https://raw.githubusercontent.com/Zykosiz/Netip/refs/heads/main/netip.ps1 | iex
