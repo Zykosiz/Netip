@@ -5,7 +5,7 @@ choco feature enable -n=allowGlobalConfirmation
 choco install googlechrome --ignore-checksums
 #choco install lenovo-thinkvantage-system-update --ignore-checksums
 choco install adobereader --ignore-checksums
-# Set temp
+# Set temp for folder check
 $path = "c:\temp\"
 
 # Check if folder not exists, and create it
@@ -17,10 +17,10 @@ $url = "https://customdesignservice.teamviewer.com/download/windows/v15/6kyy3pe/
 $dest = "C:\Temp\Netip.exe"
 # Download file
 Start-BitsTransfer -Source $url -Destination $dest 
-Start-Sleep -Seconds 3
+Start-Sleep -Seconds 10
 # Move to current Desktop
 Move-Item -Path "C:\Temp\Netip.exe" -Destination "$env:userprofile\Desktop\Netip Support.exe"
-Start-Sleep -Seconds 3
+Start-Sleep -Seconds 5
 #Windows Update
 Install-Module -Name PSWindowsUpdate -Force
 Import-Module -Name PSWindowsUpdate
