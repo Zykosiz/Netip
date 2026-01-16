@@ -32,6 +32,21 @@ $updates | Install-LSUpdate -Verbose
 } Else {
     Write-Host "This is not a Lenovo PC"
 }
+#Choco disable Globalallow
+choco feature disable -n=allowGlobalConfirmation
+#================================
+# UNPIN ALL TASKBAR ICONS
+#================================
+
+# Remove all files inside the Taskbar APPDATA folder
+  Remove-Item -Path "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*" -Force -Recurse -ErrorAction SilentlyContinue
+
+# Remove the Taskband Registry Key to delete taskbar data for recent apps.
+  Remove-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband" -Force -Recurse -ErrorAction SilentlyContinue
+
+#Start-Stop the File Explorer to refresh the taskbar.
+  Stop-Process -ProcessName explorer -Force
+  Start-Process explorer
 <##Windows Update
 Install-PackageProvider NuGet -Force
 #Set-PackageSource -Name 'NuGet' -Trusted
@@ -41,13 +56,7 @@ Get-WindowsUpdate
 Start-Sleep -Seconds 30
 Install-WindowsUpdate -AcceptAll -AutoReboot
 Start-Sleep -Seconds 5#>
-Restart-Computer -Force
-
-#Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
-#choco feature enable -n=allowGlobalConfirmation
-#choco install googlechrome --ignore-checksums
-#Invoke-WebRequest "https://get.teamviewer.com/6nsd5xz" -OutFile "C:\Temp\Netip.exe"
-#Move-Item -Path "C:\Temp\Netip.exe" -Destination ""$env:userprofile\desktop\netip.exe"" -Force
+#Restart-Computer -Force
 
 
 #Install-PackageProvider -Name NuGet -Force | Out-Null
