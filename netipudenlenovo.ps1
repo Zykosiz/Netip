@@ -22,6 +22,7 @@ Start-Sleep -Seconds 10
 Move-Item -Path "C:\Temp\Netip.exe" -Destination "$env:userprofile\Desktop\Netip Support.exe"
 Start-Sleep -Seconds 5
 #Windows Update
+Install-PackageProvider NuGet -Force
 Set-PackageSource -Name 'NuGet' -Trusted
 Install-Module -Name PSWindowsUpdate -Force
 Import-Module -Name PSWindowsUpdate
