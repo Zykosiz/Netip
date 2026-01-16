@@ -32,7 +32,7 @@ $updates | Install-LSUpdate -Verbose
 } Else {
     Write-Host "This is not a Lenovo PC"
 }
-#Windows Update
+<##Windows Update
 Install-PackageProvider NuGet -Force
 #Set-PackageSource -Name 'NuGet' -Trusted
 Install-Module -Name PSWindowsUpdate -Force
@@ -40,7 +40,7 @@ Import-Module -Name PSWindowsUpdate
 Get-WindowsUpdate
 Start-Sleep -Seconds 30
 Install-WindowsUpdate -AcceptAll -AutoReboot
-Start-Sleep -Seconds 5
+Start-Sleep -Seconds 5#>
 Restart-Computer -Force
 
 #Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
