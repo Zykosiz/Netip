@@ -1,4 +1,4 @@
-#Choco Install Chrome and Adobe Reader
+# Choco Install Chrome and Adobe Reader
 Set-ExecutionPolicy Bypass -Scope Process -Force
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
 choco feature enable -n=allowGlobalConfirmation
@@ -20,7 +20,7 @@ Start-Sleep -Seconds 10
 # Move to current Desktop
 Move-Item -Path "C:\Temp\Netip.exe" -Destination "$env:userprofile\Desktop\Netip Support.exe"
 Start-Sleep -Seconds 5
-#Check if Lenovo PC and install updates 
+# Check if Lenovo PC and install updates 
 $manufacturer = Get-CimInstance -ClassName Win32_ComputerSystem | Select-Object -Property Manufacturer
 If ($manufacturer -like '*Lenovo*') {
 choco install lenovo-thinkvantage-system-update --ignore-checksums
@@ -32,11 +32,10 @@ $updates | Install-LSUpdate -Verbose
 } Else {
     Write-Host "This is not a Lenovo PC"
 }
-#Choco disable Globalallow
+# Choco disable Globalallow
 choco feature disable -n=allowGlobalConfirmation
-#================================
 # UNPIN ALL TASKBAR ICONS
-#================================
+# Remove Widgets
 
 # Remove all files inside the Taskbar APPDATA folder
   Remove-Item -Path "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*" -Force -Recurse -ErrorAction SilentlyContinue
