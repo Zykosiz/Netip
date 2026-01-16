@@ -36,7 +36,8 @@ $updates | Install-LSUpdate -Verbose
 choco feature disable -n=allowGlobalConfirmation
 # UNPIN ALL TASKBAR ICONS
 # Remove Widgets
-
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests\" -Name "AllowNewsAndInterests" -Value "0"
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Dsh\" -Name "AllowNewsAndInterests" -Value "0"
 # Remove all files inside the Taskbar APPDATA folder
   Remove-Item -Path "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*" -Force -Recurse -ErrorAction SilentlyContinue
 
