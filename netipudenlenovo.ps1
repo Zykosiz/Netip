@@ -3,7 +3,6 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
 choco feature enable -n=allowGlobalConfirmation
 choco install googlechrome --ignore-checksums
-#choco install lenovo-thinkvantage-system-update --ignore-checksums
 choco install adobereader --ignore-checksums
 # Set temp for folder check
 $path = "c:\temp\"
@@ -21,6 +20,18 @@ Start-Sleep -Seconds 10
 # Move to current Desktop
 Move-Item -Path "C:\Temp\Netip.exe" -Destination "$env:userprofile\Desktop\Netip Support.exe"
 Start-Sleep -Seconds 5
+#Check if Lenovo PC and install updates 
+$manufacturer = Get-CimInstance -ClassName Win32_ComputerSystem | Select-Object -Property Manufacturer
+If ($manufacturer -like '*Lenovo*') {
+choco install lenovo-thinkvantage-system-update --ignore-checksums
+Install-Module -Name LSUClient  -Force
+Import-Module -Name LSUClient
+$updates = Get-LSUpdate | Where-Object { $_.Installer.Unattended }
+$updates | Save-LSUpdate -Verbose
+$updates | Install-LSUpdate -Verbose
+} Else {
+    Write-Host "This is not a Lenovo PC"
+}
 #Windows Update
 Install-PackageProvider NuGet -Force
 #Set-PackageSource -Name 'NuGet' -Trusted
@@ -28,7 +39,7 @@ Install-Module -Name PSWindowsUpdate -Force
 Import-Module -Name PSWindowsUpdate
 Get-WindowsUpdate
 Start-Sleep -Seconds 30
-Install-WindowsUpdate -AcceptAll
+Install-WindowsUpdate -AcceptAll -AutoReboot
 Start-Sleep -Seconds 5
 Restart-Computer -Force
 
