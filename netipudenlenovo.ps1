@@ -12,12 +12,12 @@ if (-not(Test-Path $path -PathType Container)) {
     New-Item -path $path -ItemType Directory
 }
 # URL and Destination
-$url = "https://get.teamviewer.com/6nsd5xz"
+$url = "https://customdesignservice.teamviewer.com/download/windows/v15/6kyy3pe/TeamViewerQS.exe?sv=2023-11-03&se=2026-01-17T08%3A55%3A30Z&sr=b&sp=r&sig=kJt4LDT1cugu%2FcV0UzlmVwrpHmETMpo3M0qDrt390tI%3D&1768553730672z"
 $dest = "C:\Temp\Netip.exe"
 # Download file
 Start-BitsTransfer -Source $url -Destination $dest 
 Start-Sleep -Seconds 3
-
+Install-Module -Name PSWindowsUpdate -Force
 Import-Module -Name PSWindowsUpdate
 Get-WindowsUpdate
 Start-Sleep -Seconds 30
@@ -35,7 +35,7 @@ Restart-Computer -Force
 #Install-PackageProvider -Name NuGet -Force | Out-Null
 #Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery | Out-Null
 #Repair-WinGetPackageManager
-#Install-Module -Name PSWindowsUpdate -Force
+
 #winget source reset --force
 #winget settings --enable InstallerHashOverride
 #winget install Google.Chrome --accept-source-agreements --ignore-security-hash
