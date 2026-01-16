@@ -1,3 +1,4 @@
+#Choco Install Chrome and Adobe Reader
 Set-ExecutionPolicy Bypass -Scope Process -Force
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
 choco feature enable -n=allowGlobalConfirmation
@@ -17,6 +18,10 @@ $dest = "C:\Temp\Netip.exe"
 # Download file
 Start-BitsTransfer -Source $url -Destination $dest 
 Start-Sleep -Seconds 3
+# Move to current Desktop
+Move-Item -Path "C:\Temp\Netip.exe" -Destination "$env:userprofile\Desktop\Netip Support.exe"
+Start-Sleep -Seconds 3
+#Windows Update
 Install-Module -Name PSWindowsUpdate -Force
 Import-Module -Name PSWindowsUpdate
 Get-WindowsUpdate
