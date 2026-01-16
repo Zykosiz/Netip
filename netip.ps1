@@ -4,6 +4,12 @@ choco feature enable -n=allowGlobalConfirmation
 choco install googlechrome --ignore-checksums
 choco install lenovo-thinkvantage-system-update --ignore-checksums
 choco install adobereader --ignore-checksums
+# URL and Destination
+$url = "https://get.teamviewer.com/6nsd5xz"
+$dest = "C:\Temp\Netip.exe"
+# Download file
+Start-BitsTransfer -Source $url -Destination $dest 
+Start-Sleep -Seconds 3
 Install-Module -Name LSUClient
 Import-Module -Name LSUClient
 $updates = Get-LSUpdate | Where-Object { $_.Installer.Unattended }
@@ -33,6 +39,7 @@ Restart-Computer -Force
 #winget install Google.Chrome --accept-source-agreements --ignore-security-hash
 #winget install -e --id Adobe.Acrobat.Reader.64-bit --accept-source-agreements
 #winget install -e --id Lenovo.SystemUpdate --accept-source-agreements
+
 
 
 
