@@ -4,6 +4,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 choco feature enable -n=allowGlobalConfirmation
 choco install googlechrome --ignore-checksums
 choco install adobereader --ignore-checksums
+
 # Set temp for folder check
 $path = "c:\temp\"
 
@@ -11,14 +12,13 @@ $path = "c:\temp\"
 if (-not(Test-Path $path -PathType Container)) {
     New-Item -path $path -ItemType Directory
 }
-# URL and Destination
-$url = "https://get.teamviewer.com/6kyy3pe"
-$dest = "C:\Temp\Netip.exe"
 # Download file
-Start-BitsTransfer -Source $url -Destination $dest 
-Start-Sleep -Seconds 10
+$ProgressPreference = 'SilentlyContinue'
+curl "https://customdesignservice.teamviewer.com/download/windows/v15/6kyy3pe/TeamViewerQS.exe?sv=2023-11-03&se=2026-01-20T07%3A48%3A01Z&sr=b&sp=r&sig=2yy7%2BQsHlwYPf%2FiAl5TGY5JPIqwS3BptGL4lVBivba4%3D&1768808882084" -OutFile "C:\temp\netip.exe"
+Start-Sleep -Seconds 5
 # Move to current Desktop
 Move-Item -Path "C:\Temp\Netip.exe" -Destination "$env:userprofile\Desktop\Netip Support.exe"
+$ProgressPreference = 'Continue'
 Start-Sleep -Seconds 5
 # Check if Lenovo PC and install updates 
 $manufacturer = Get-CimInstance -ClassName Win32_ComputerSystem | Select-Object -Property Manufacturer
@@ -31,13 +31,21 @@ $updates | Save-LSUpdate -Verbose
 $updates | Install-LSUpdate -Verbose
 } Else {
     Write-Host "This is not a Lenovo PC"
+    Start-Sleep -Seconds 20
 }
 # Choco disable Globalallow
 choco feature disable -n=allowGlobalConfirmation
+#Error hide
+$ErrorActionPreference= 'silentlycontinue'
 # UNPIN ALL TASKBAR ICONS
 # Remove Widgets
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests\" -Name "AllowNewsAndInterests" -Value "0"
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Dsh\" -Name "AllowNewsAndInterests" -Value "0"
+
+New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests\" -Name "AllowNewsAndInterests" -Value "0"
+New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Dsh\" -Name "AllowNewsAndInterests" -Value "0"
+
+
 # Remove all files inside the Taskbar APPDATA folder
   Remove-Item -Path "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*" -Force -Recurse -ErrorAction SilentlyContinue
 
