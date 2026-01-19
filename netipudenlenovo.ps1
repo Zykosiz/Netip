@@ -12,7 +12,7 @@ if (-not(Test-Path $path -PathType Container)) {
     New-Item -path $path -ItemType Directory
 }
 # URL and Destination
-$url = "https://customdesignservice.teamviewer.com/download/windows/v15/6kyy3pe/TeamViewerQS.exe?sv=2023-11-03&se=2026-01-17T08%3A55%3A30Z&sr=b&sp=r&sig=kJt4LDT1cugu%2FcV0UzlmVwrpHmETMpo3M0qDrt390tI%3D&1768553730672z"
+$url = "https://get.teamviewer.com/6kyy3pe"
 $dest = "C:\Temp\Netip.exe"
 # Download file
 Start-BitsTransfer -Source $url -Destination $dest 
