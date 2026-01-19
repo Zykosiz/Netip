@@ -55,8 +55,8 @@ $ErrorActionPreference= 'continue'
 #Start-Stop the File Explorer to refresh the taskbar.
   Stop-Process -ProcessName explorer -Force
   Start-Process explorer
-  Start-Sleep 100
-<##Windows Update
+  Start-Sleep -seconds 30
+#Windows Update
 Install-PackageProvider NuGet -Force
 #Set-PackageSource -Name 'NuGet' -Trusted
 Install-Module -Name PSWindowsUpdate -Force
@@ -64,7 +64,7 @@ Import-Module -Name PSWindowsUpdate
 Get-WindowsUpdate
 Start-Sleep -Seconds 30
 Install-WindowsUpdate -AcceptAll -AutoReboot
-Start-Sleep -Seconds 5#>
+Start-Sleep -Seconds 5
 Restart-Computer -Force
 
 
