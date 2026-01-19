@@ -44,8 +44,8 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Dsh\" -Name "AllowNews
 
 New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests\" -Name "AllowNewsAndInterests" -Value "0"
 New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Dsh\" -Name "AllowNewsAndInterests" -Value "0"
-
-
+#Error Show
+$ErrorActionPreference= 'silentlycontinue'
 # Remove all files inside the Taskbar APPDATA folder
   Remove-Item -Path "$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\*" -Force -Recurse -ErrorAction SilentlyContinue
 
@@ -55,6 +55,7 @@ New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Dsh\" -Name "AllowNews
 #Start-Stop the File Explorer to refresh the taskbar.
   Stop-Process -ProcessName explorer -Force
   Start-Process explorer
+  Start-Sleep 100
 <##Windows Update
 Install-PackageProvider NuGet -Force
 #Set-PackageSource -Name 'NuGet' -Trusted
@@ -64,7 +65,7 @@ Get-WindowsUpdate
 Start-Sleep -Seconds 30
 Install-WindowsUpdate -AcceptAll -AutoReboot
 Start-Sleep -Seconds 5#>
-#Restart-Computer -Force
+Restart-Computer -Force
 
 
 #Install-PackageProvider -Name NuGet -Force | Out-Null
