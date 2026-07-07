@@ -15,11 +15,20 @@ $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Pri
 if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "Not running as admin, relaunching elevated..."
     $scriptPath = $MyInvocation.MyCommand.Definition
-    Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" -Verb RunAs
+    # -NoExit keeps the elevated window open after the script finishes
+    Start-Process powershell.exe -ArgumentList "-NoExit -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" -Verb RunAs
     exit
 }
 
 Write-Host "Running with admin privileges." -ForegroundColor Green
+
+# Summary tracker
+$summary = [ordered]@{
+    "ESET"           = "Not checked"
+    "Heimdal"        = "Not checked"
+    "Admin Enabled"  = "Not checked"
+    "Admin Password" = "Not checked"
+}
 
 # ------------------------------------------------------------------
 # Helper: find & silently uninstall by DisplayName match via registry
@@ -40,8 +49,10 @@ function Uninstall-ByDisplayNameMatch {
 
     if (-not $apps) {
         Write-Host "$FriendlyName not found. Skipping." -ForegroundColor Yellow
-        return
+        return "Not installed"
     }
+
+    $results = @()
 
     foreach ($app in $apps) {
         Write-Host "Found $($app.DisplayName). Attempting uninstall..." -ForegroundColor Cyan
@@ -76,39 +87,64 @@ function Uninstall-ByDisplayNameMatch {
                 }
             }
             Write-Host "$($app.DisplayName) uninstall command executed." -ForegroundColor Green
+            $results += "$($app.DisplayName): Uninstall command executed"
         }
         catch {
             Write-Host "Failed to uninstall $($app.DisplayName): $_" -ForegroundColor Red
+            $results += "$($app.DisplayName): FAILED - $_"
         }
     }
+
+    return ($results -join "; ")
 }
 
 # ------------------------------------------------------------------
 # 1. ESET
 # ------------------------------------------------------------------
-Uninstall-ByDisplayNameMatch -Pattern "ESET" -FriendlyName "ESET Antivirus"
+$summary["ESET"] = Uninstall-ByDisplayNameMatch -Pattern "ESET" -FriendlyName "ESET Antivirus"
 
 # ------------------------------------------------------------------
 # 2. Heimdal
 # ------------------------------------------------------------------
-Uninstall-ByDisplayNameMatch -Pattern "Heimdal" -FriendlyName "Heimdal Antivirus"
+$summary["Heimdal"] = Uninstall-ByDisplayNameMatch -Pattern "Heimdal" -FriendlyName "Heimdal Antivirus"
 
 # ------------------------------------------------------------------
 # 3. Enable local Administrator account if disabled
 # ------------------------------------------------------------------
 try {
-    $adminAccount = Get-LocalUser -Name "Administrator" -ErrorAction Stop
+    # Find the built-in Administrator account by SID suffix -500
+    # (locale-safe: the account name itself can be translated on non-English Windows)
+    $adminAccount = Get-LocalUser -ErrorAction Stop | Where-Object { $_.SID -like "*-500" }
+
+    if (-not $adminAccount) {
+        throw "Could not find an account with RID 500 (built-in Administrator)."
+    }
+
+    $realAdminName = $adminAccount.Name
+    Write-Host "Built-in Administrator account found: '$realAdminName' (SID: $($adminAccount.SID))" -ForegroundColor Cyan
 
     if (-not $adminAccount.Enabled) {
-        Write-Host "Local Administrator account is disabled. Enabling..." -ForegroundColor Cyan
-        Enable-LocalUser -Name "Administrator"
-        Write-Host "Local Administrator account enabled." -ForegroundColor Green
+        Write-Host "Account is disabled. Enabling..." -ForegroundColor Cyan
+        Enable-LocalUser -Name $realAdminName
+        # Re-check to confirm it actually took (e.g. GPO could re-disable it)
+        Start-Sleep -Milliseconds 500
+        $recheck = Get-LocalUser -Name $realAdminName
+        if ($recheck.Enabled) {
+            Write-Host "Confirmed: account is now enabled." -ForegroundColor Green
+            $summary["Admin Enabled"] = "Was disabled - now Enabled ('$realAdminName')"
+        } else {
+            Write-Host "WARNING: Enable-LocalUser ran but account still shows Disabled. A GPO/local security policy may be re-disabling it." -ForegroundColor Red
+            $summary["Admin Enabled"] = "FAILED - still disabled after Enable-LocalUser (check GPO 'Accounts: Administrator account status')"
+        }
     } else {
-        Write-Host "Local Administrator account is already enabled." -ForegroundColor Green
+        Write-Host "Account is already enabled." -ForegroundColor Green
+        $summary["Admin Enabled"] = "Already enabled ('$realAdminName')"
     }
 }
 catch {
-    Write-Host "Could not query/enable local Administrator account: $_" -ForegroundColor Red
+    Write-Host "Could not query/enable built-in Administrator account: $_" -ForegroundColor Red
+    $summary["Admin Enabled"] = "FAILED - $_"
+    $realAdminName = "Administrator"  # fallback for password step
 }
 
 # ------------------------------------------------------------------
@@ -116,11 +152,23 @@ catch {
 # ------------------------------------------------------------------
 try {
     $securePassword = ConvertTo-SecureString "1234" -AsPlainText -Force
-    Set-LocalUser -Name "Administrator" -Password $securePassword
-    Write-Host "Local Administrator password updated." -ForegroundColor Green
+    Set-LocalUser -Name $realAdminName -Password $securePassword
+    Write-Host "Password updated for '$realAdminName'." -ForegroundColor Green
+    $summary["Admin Password"] = "Set to 1234 ('$realAdminName')"
 }
 catch {
     Write-Host "Failed to set Administrator password: $_" -ForegroundColor Red
+    $summary["Admin Password"] = "FAILED - $_"
 }
 
-Write-Host "`nScript complete." -ForegroundColor Green
+# ------------------------------------------------------------------
+# Final summary
+# ------------------------------------------------------------------
+Write-Host "`n========== SUMMARY ==========" -ForegroundColor Magenta
+foreach ($key in $summary.Keys) {
+    Write-Host ("{0,-16}: {1}" -f $key, $summary[$key])
+}
+Write-Host "==============================" -ForegroundColor Magenta
+
+Write-Host "`nScript complete. Press Enter to close..." -ForegroundColor Green
+Read-Host | Out-Null
